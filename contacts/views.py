@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 # Email Sending Utility
 # ──────────────────────────────────────────────
 
-def send_email(to_email, subject, html_body):
+def send_email(to_email, subject, html_body, reply_to=None):
     """
     Send an email via the Resend API. Returns True on success, False on failure.
     Failures are logged but not re-raised so they don't crash the request.
@@ -32,12 +32,15 @@ def send_email(to_email, subject, html_body):
 
     try:
         resend.api_key = api_key
-        response = resend.Emails.send({
+        payload = {
             "from": "Meg Logistics <noreply@meglogistic.com>",
             "to": [to_email],
             "subject": subject,
             "html": html_body,
-        })
+        }
+        if reply_to:
+            payload["reply_to"] = reply_to
+        response = resend.Emails.send(payload)
         logger.info("Email sent successfully to %s (Resend ID: %s)", to_email, response.get("id"))
         return True
     except Exception as exc:
@@ -140,6 +143,7 @@ def send_contact_emails(submission):
             to_email=settings.NOTIFICATION_EMAIL,
             subject=f"New Contact Form Submission — {submission.name}",
             html_body=notification_body,
+            reply_to="Meg Logistics <info@meglogistic.com>",
         )
     except Exception as exc:
         background_logger.exception("Failed to send notification email: %s", exc)
