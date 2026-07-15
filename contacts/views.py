@@ -33,7 +33,7 @@ def send_email(to_email, subject, html_body):
     try:
         resend.api_key = api_key
         response = resend.Emails.send({
-            "from": "Meg Logistics <info@meglogistic.com>",
+            "from": "Meg Logistics <noreply@meglogistic.com>",
             "to": [to_email],
             "subject": subject,
             "html": html_body,
